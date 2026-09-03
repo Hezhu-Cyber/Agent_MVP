@@ -1,5 +1,7 @@
 # Agent_MVP
 
+> 项目材料：AI Prompt 与问题解决记录见 [`AI Prompt 与问题解决记录.md`](AI%20Prompt%20与问题解决记录.md)，架构设计题见 [`架构设计题.md`](架构设计题.md)。
+
 一个从零实现的最小可用 Agent Runtime。核心循环、工具调度、Session、Context 压缩和 Trace 均自行实现，**不依赖 LangGraph、OpenHands、OpenClaw 等 Agent 框架**。
 
 ## 功能
@@ -139,4 +141,4 @@ python -m pytest -q -m live_llm
 - 每个 Step 只执行一个工具调用
 - 未实现流式输出、向量检索、多 Agent 和生产级鉴权
 
-详细设计见 [`docs/design.md`](docs/design.md)，Prompt 见 [`docs/prompts.md`](docs/prompts.md)，AI 辅助开发记录见 [`docs/ai-development-log.md`](docs/ai-development-log.md)。
+详细设计见 [`docs/design.md`](docs/design.md)，Prompt 见 [`docs/prompts.md`](docs/prompts.md)。
