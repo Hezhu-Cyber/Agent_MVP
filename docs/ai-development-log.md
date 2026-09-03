@@ -87,18 +87,6 @@ AI 实际运行离线测试、真实 LLM 测试和网页端到端测试，检查
 
 真实模型回答包含 Emoji 时，Windows GBK 终端出现 `UnicodeEncodeError`。随后增加安全输出处理，避免 CLI 因个别字符无法显示而退出。
 
-## 7. 整理提交材料
-
-**Prompt**
-
-> 请部署到 GitHub，并写好 README，说明运行方式、系统设计、Memory 的召回时机与放置方式。
->
-> README 是给面试官看的，请精简内容。
-
-**处理**
-
-AI 完善 `.gitignore`，确认 `.env`、数据库、日志和虚拟环境未被跟踪，并协助完成 GitHub 推送。README 最终只保留项目简介、运行方式、架构、Loop、Session/Memory、异常、Trace、测试和项目边界。
-
 ## 最终结果
 
 - 代码仓库：[Hezhu-Cyber/Agent_MVP](https://github.com/Hezhu-Cyber/Agent_MVP)
