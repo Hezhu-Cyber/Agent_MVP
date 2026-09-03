@@ -1,113 +1,120 @@
 # AI 辅助开发与问题解决记录
 
-本项目使用 AI 辅助拆解需求、生成代码初稿和补充测试。我负责确定 MVP 范围、技术选型、人工验收及问题修正。以下记录保留实际开发中的主要 Prompt 和判断。
+本项目使用 AI 辅助拆解需求、实现代码和补充测试。实际过程是先生成执行文档，再按文档完成 MVP，最后通过人工运行持续修正。
 
-## 1. 明确 MVP 范围
-
-**Prompt**
-
-> 请拆解这道 Agent Runtime 笔试题，整理一个最小可用的开发计划。不能使用 LangGraph、OpenHands、OpenClaw，优先保证可以运行和演示。
-
-**判断与结果**
-
-选择 Python + SQLite，只实现核心 Loop、工具、Session、Context、异常、Trace 和测试，不扩展 RAG、多 Agent、流式输出等非必需功能。
-
-## 2. 确定工具和 Mock 边界
+## 1. 先整理执行文档
 
 **Prompt**
 
-> search 可以 Mock 是什么意思？怎样实现既能演示 LLM 自主调用工具，又方便稳定测试？
+> 请帮我整理这道 Agent Runtime 笔试题的解题计划。要求从零完成，不能依赖 LangGraph、OpenHands、OpenClaw。保证 Agent 最小可用即可，并输出一份执行文档。
 
-**判断与结果**
+**处理**
 
-LLM 使用真实 API；`search` 和 `weather` 返回固定模拟数据；`calculator` 和 `todo` 执行真实逻辑。这样避免依赖额外服务，同时保证多步流程可重复测试。
+AI 将题目拆成 Agent Loop、工具、真实 LLM、Session、Context、异常、Trace 和测试。我确认只完成可运行、可演示的 MVP，不扩展 RAG、多 Agent 和流式输出。
 
-## 3. 实现工具注册和 Agent Loop
-
-**Prompt**
-
-> 实现 BaseTool、ToolRegistry 和核心 Agent Loop。每个工具提供名称、描述、参数 Schema 和执行函数；Runtime 负责解析工具调用、校验参数、执行工具并把结果交回 LLM。
-
-**判断与结果**
-
-Runtime 只负责流程控制，具体工具逻辑独立实现。`user_id`、`session_id` 由 Runtime 注入，不能由 LLM 传入。单次请求最多执行 6 步，并检测连续重复调用。
-
-## 4. 实现 Session 和 Context
+## 2. 理解 Mock 并确定技术方案
 
 **Prompt**
 
-> 使用 `user_id + session_id` 隔离会话，支持重启恢复、普通追问和带工具结果的追问。Context 过长时做基础摘要，数据库保留完整历史。
+> Mock 是什么意思？
 
-**判断与结果**
+**处理**
 
-- 对话和摘要按 `user_id + session_id` 隔离。
-- Todo 是用户级业务数据，按 `user_id` 隔离。
-- 每次调用 LLM 前放入 System Prompt、历史摘要和最近消息。
-- 未压缩消息超过 20 条时总结较早历史，保留最近 10 条原文。
-- 不把 API Key、完整 Trace、其他 Session 消息和隐藏思维链放入 Context。
+Mock 用固定本地数据模拟外部服务，便于稳定演示和测试。最终选择 Python + SQLite；LLM 使用真实 API；`search`、`weather` 使用 Mock；`calculator`、`todo` 执行真实逻辑。
 
-## 5. 增加异常处理和 Trace
+## 3. 按文档实现项目
 
 **Prompt**
 
-> 处理 LLM 超时、429、5xx、非法输出、工具参数错误、工具异常、重复调用和 Context 压缩失败。每次请求生成 trace_id，并记录 JSONL 日志。
+> 请按照这个执行文档帮我完成这个项目。
+>
+> 继续。
 
-**判断与结果**
+**处理**
 
-可恢复的 LLM 错误最多重试 2 次；工具错误转为结构化结果交回 LLM。Trace 记录 Step、决策、工具参数、结果和耗时，但不记录 API Key。
+AI 创建了自研 Agent Runtime、LLM Client、Output Parser、Tool Registry、四个工具、SQLite Store、Context 压缩、异常处理、Trace、CLI 和测试。我检查项目结构，确认核心流程没有使用现成 Agent 框架。
 
-## 6. 构建自动化测试
-
-**Prompt**
-
-> 使用 pytest 和 ScriptedLLM 测试直接回答、工具循环、多工具调用、Session 隔离、Context 压缩、安全性和异常处理；再增加三个默认跳过的真实 LLM 测试。
-
-**判断与结果**
-
-离线测试验证自研 Runtime，不依赖外部 API；真实测试覆盖 `calculator`、`search` 和 `weather → todo`。最终结果为 21 个离线测试和 3 个真实 LLM 测试通过。
-
-## 7. 增加本地 Web UI
+## 4. 定位代码并运行
 
 **Prompt**
 
-> 在现有 Runtime 上增加最小网页界面，支持聊天、切换 Session、查看 Todo 和 Trace。保留 CLI，网页与 CLI 共用 SQLite，不增加复杂前端框架。
+> 这个代码在哪？
+>
+> 请复制到 `C:\Users\manba\Desktop\Agent_MVP`。
+>
+> 怎么运行这个代码？
 
-**判断与结果**
+**处理**
 
-使用 Python 标准库 HTTP Server 和原生 HTML/CSS/JavaScript。Web UI 只是新的输入输出入口，不修改 Agent Runtime 主流程。
+AI 整理桌面项目并补充环境配置、依赖安装和启动说明。我在本地 `.env` 配置真实 LLM，API Key 没有提交到 Git。
 
-## 8. 人工验收发现的问题
+## 5. 增加可视化界面
 
-### Todo 被误调用
+**Prompt**
+
+> 请在这个代码基础上，再加个可视化界面。
+
+**处理**
+
+AI 增加本地 Web UI，支持聊天、切换 Session、查看 Todo 和 Trace。网页与 CLI 共用原来的 Agent Runtime 和 SQLite，没有重复实现核心流程。
+
+## 6. 理解核心代码
+
+项目运行后，我继续询问：
+
+> 核心 Agent Runtime 是什么？Loop 大致步骤是什么？
+>
+> Session 管理是什么逻辑？Context 如何有效管理？
+>
+> 异常处理、Trace 和测试用例有哪些？
+
+**处理**
+
+通过代码和解释确认：对话按 `user_id + session_id` 隔离；Todo 按 `user_id` 隔离；每次调用 LLM 前按“System Prompt → 历史摘要 → 最近消息”构建 Context；工具调用和结果进入消息历史；项目不保存隐藏思维链。
+
+## 7. 完整测试并修正问题
+
+**Prompt**
+
+> 请帮我测试这个项目是否符合预期要求。
+
+**处理**
+
+AI 实际运行离线测试、真实 LLM 测试和网页端到端测试，检查 Session、持久化、工具链、Context 压缩、Trace 和敏感文件。结果为：
+
+```text
+21 个离线测试通过
+3 个真实 LLM 测试通过
+```
+
+### 问题一：Todo 误调用
 
 输入“请记住项目代号是蓝鲸42”时，模型曾错误创建 Todo。
 
-**修正 Prompt**
+> 请收紧 Todo 调用提示词。只有用户明确要求创建、查询或完成待办、任务、提醒时才调用 Todo；普通信息使用 Session 历史记忆。
 
-> 只有用户明确要求创建、查询或完成待办、任务、提醒时才调用 Todo。普通事实、名称、代号和偏好应使用 Session 历史记忆。
+复测后，普通记忆不再调用 Todo，明确待办请求仍能正常执行。
 
-复测结果：普通记忆请求不调用工具；明确的“创建待办”请求仍能正常调用 Todo。
+### 问题二：Windows 终端编码
 
-### Windows CLI 编码错误
+真实模型回答包含 Emoji 时，Windows GBK 终端出现 `UnicodeEncodeError`。随后增加安全输出处理，避免 CLI 因个别字符无法显示而退出。
 
-模型回答包含 Emoji 时，Windows GBK 终端出现 `UnicodeEncodeError`。
-
-**修正 Prompt**
-
-> CLI 遇到当前终端无法编码的字符时应安全替换，不能因为打印模型回答而退出。
-
-修复后带 Emoji 的回答不会导致 CLI 崩溃。
-
-## 9. 最终验收
+## 8. 整理提交材料
 
 **Prompt**
 
-> 按原始要求实际运行离线测试、真实 LLM 测试和网页端到端测试，并检查 Session、持久化、Trace 与敏感文件，不要只给出静态代码结论。
+> 请部署到 GitHub，并写好 README，说明运行方式、系统设计、Memory 的召回时机与放置方式。
+>
+> README 是给面试官看的，请精简内容。
 
-**结果**
+**处理**
 
-- 21 个离线测试通过
-- 3 个真实 LLM 测试通过
-- Calculator、Search、Weather → Todo 调用成功
-- 普通追问、工具追问和 Session 隔离通过
-- `.env`、数据库、日志和虚拟环境未上传 GitHub
+AI 完善 `.gitignore`，确认 `.env`、数据库、日志和虚拟环境未被跟踪，并协助完成 GitHub 推送。README 最终只保留项目简介、运行方式、架构、Loop、Session/Memory、异常、Trace、测试和项目边界。
+
+## 最终结果
+
+- 代码仓库：[Hezhu-Cyber/Agent_MVP](https://github.com/Hezhu-Cyber/Agent_MVP)
+- 核心 Runtime、工具调度、Session 和 Context 均自行实现
+- CLI 与 Web UI 可运行
+- 21 个离线测试、3 个真实 LLM 测试通过
+- `.env`、数据库和 Trace 日志未上传
