@@ -36,21 +36,7 @@ AI 将笔试要求逐项映射到模块，确认核心 Loop、工具 Schema、Se
 
 AI 创建了自研 Agent Runtime、LLM Client、Output Parser、Tool Registry、四个工具、SQLite Store、Context 压缩、异常处理、Trace、CLI 和测试。我检查项目结构，确认核心流程没有使用现成 Agent 框架。
 
-## 4. 定位代码并运行
-
-**Prompt**
-
-> 这个代码在哪？
->
-> 请复制到 `C:\Users\manba\Desktop\Agent_MVP`。
->
-> 怎么运行这个代码？
-
-**处理**
-
-AI 整理桌面项目并补充环境配置、依赖安装和启动说明。我在本地 `.env` 配置真实 LLM，API Key 没有提交到 Git。
-
-## 5. 增加可视化界面
+## 4. 增加可视化界面
 
 **Prompt**
 
@@ -60,7 +46,7 @@ AI 整理桌面项目并补充环境配置、依赖安装和启动说明。我�
 
 AI 增加本地 Web UI，支持聊天、切换 Session、查看 Todo 和 Trace。网页与 CLI 共用原来的 Agent Runtime 和 SQLite，没有重复实现核心流程。
 
-## 6. 理解核心代码
+## 5. 理解核心代码
 
 项目运行后，我继续询问：
 
@@ -74,7 +60,7 @@ AI 增加本地 Web UI，支持聊天、切换 Session、查看 Todo 和 Trace�
 
 通过代码和解释确认：对话按 `user_id + session_id` 隔离；Todo 按 `user_id` 隔离；每次调用 LLM 前按“System Prompt → 历史摘要 → 最近消息”构建 Context；工具调用和结果进入消息历史；项目不保存隐藏思维链。
 
-## 7. 完整测试并修正问题
+## 6. 完整测试并修正问题
 
 **Prompt**
 
@@ -101,7 +87,7 @@ AI 实际运行离线测试、真实 LLM 测试和网页端到端测试，检查
 
 真实模型回答包含 Emoji 时，Windows GBK 终端出现 `UnicodeEncodeError`。随后增加安全输出处理，避免 CLI 因个别字符无法显示而退出。
 
-## 8. 整理提交材料
+## 7. 整理提交材料
 
 **Prompt**
 
