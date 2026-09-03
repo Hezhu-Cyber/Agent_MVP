@@ -12,15 +12,17 @@
 
 AI 将题目拆成 Agent Loop、工具、真实 LLM、Session、Context、异常、Trace 和测试。我确认只完成可运行、可演示的 MVP，不扩展 RAG、多 Agent 和流式输出。
 
-## 2. 理解 Mock 并确定技术方案
+## 2. 按要求逐个检查模块设计
 
 **Prompt**
 
-> Mock 是什么意思？
+> 请根据执行文档，逐个检查项目需要的模块是否覆盖了题目要求。
+>
+> 请分别检查 Agent Runtime、LLM Client、Output Parser、Tool Registry、Calculator、Search、Weather、Todo、Session Store、Context Builder、Trace 和测试。每个模块说明负责什么、对应哪条要求、还缺什么。先保证 MVP 完整，不增加非必需功能。
 
 **处理**
 
-Mock 用固定本地数据模拟外部服务，便于稳定演示和测试。最终选择 Python + SQLite；LLM 使用真实 API；`search`、`weather` 使用 Mock；`calculator`、`todo` 执行真实逻辑。
+AI 将笔试要求逐项映射到模块，确认核心 Loop、工具 Schema、Session 隔离、Context 压缩、异常和 Trace 都有对应实现位置，并补充了缺失的测试项。我根据检查结果确认使用 Python + SQLite、真实 LLM API，以及四个最小工具，不扩展非必需功能。
 
 ## 3. 按文档实现项目
 
