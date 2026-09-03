@@ -1,0 +1,3 @@
+# The application itself uses only Python's standard library.
+# pytest is needed for the submitted automated test suite.
+pytest>=8.0,<9.0

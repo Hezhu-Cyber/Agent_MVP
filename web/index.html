@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="最小可用 Agent Runtime 本地运行控制台" />
+    <title>Agent Runtime · 本地控制台</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">AR</div>
+          <div>
+            <p class="eyebrow">LOCAL OPERATOR CONSOLE</p>
+            <h1>Agent Runtime</h1>
+          </div>
+        </div>
+        <div class="runtime-status" id="runtimeStatus" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="runtimeStatusText">正在检查运行状态</span>
+        </div>
+      </header>
+
+      <div class="workspace-grid">
+        <aside class="sidebar" aria-label="会话控制">
+          <section class="panel-section">
+            <div class="section-heading">
+              <span class="section-index">01</span>
+              <h2>会话身份</h2>
+            </div>
+            <label for="userId">用户 ID</label>
+            <input id="userId" name="userId" value="user_a" autocomplete="off" />
+            <label for="sessionId">Session ID</label>
+            <input id="sessionId" name="sessionId" value="window_1" autocomplete="off" />
+            <button class="button button-primary button-full" id="loadSession" type="button">
+              加载会话
+            </button>
+            <div class="session-shortcuts" aria-label="快速切换会话">
+              <button class="chip is-active" data-session="window_1" type="button">窗口 1</button>
+              <button class="chip" data-session="window_2" type="button">窗口 2</button>
+            </div>
+          </section>
+
+          <section class="panel-section quick-section">
+            <div class="section-heading">
+              <span class="section-index">02</span>
+              <h2>快速任务</h2>
+            </div>
+            <button class="prompt-card" data-prompt="请使用工具计算 17 * 23" type="button">
+              <span class="prompt-label">CALCULATE</span>
+              <strong>计算 17 × 23</strong>
+            </button>
+            <button class="prompt-card" data-prompt="请使用 search 工具搜索 Agent Runtime 并总结" type="button">
+              <span class="prompt-label">SEARCH · MOCK</span>
+              <strong>搜索 Agent Runtime</strong>
+            </button>
+            <button class="prompt-card" data-prompt="查一下明天上海天气，如果下雨就帮我创建一个“出门带伞”的待办" type="button">
+              <span class="prompt-label">MULTI-STEP</span>
+              <strong>天气查询并记待办</strong>
+            </button>
+          </section>
+
+          <section class="scope-note">
+            <span>MVP SCOPE</span>
+            <p>真实 LLM · 自研 Loop · SQLite · Mock 搜索与天气</p>
+          </section>
+        </aside>
+
+        <main class="chat-panel">
+          <div class="chat-header">
+            <div>
+              <p class="eyebrow">ACTIVE SESSION</p>
+              <h2 id="activeSessionLabel">user_a / window_1</h2>
+            </div>
+            <div class="chat-meta">
+              <span id="messageCount">0 条消息</span>
+              <button class="text-button" id="refreshSession" type="button">刷新</button>
+            </div>
+          </div>
+
+          <div class="chat-scroll" id="chatScroll">
+            <div class="messages" id="messages" aria-live="polite"></div>
+            <div class="empty-state" id="emptyState">
+              <div class="empty-symbol" aria-hidden="true">↳</div>
+              <h3>开始一次可追踪的对话</h3>
+              <p>直接提问，或使用左侧快速任务观察模型如何选择并调用工具。</p>
+            </div>
+          </div>
+
+          <form class="composer" id="composer">
+            <label class="sr-only" for="messageInput">发送给 Agent 的消息</label>
+            <textarea
+              id="messageInput"
+              rows="2"
+              maxlength="5000"
+              placeholder="输入任务，例如：查天气，如果下雨就创建带伞待办…"
+            ></textarea>
+            <div class="composer-footer">
+              <span><kbd>Enter</kbd> 发送 · <kbd>Shift</kbd> + <kbd>Enter</kbd> 换行</span>
+              <button class="button button-send" id="sendButton" type="submit">
+                <span>发送</span><span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </form>
+        </main>
+
+        <aside class="inspector" aria-label="运行详情">
+          <section class="inspector-section">
+            <div class="section-heading">
+              <span class="section-index">03</span>
+              <h2>执行轨迹</h2>
+              <span class="live-badge">LIVE</span>
+            </div>
+            <div class="trace-list" id="traceList">
+              <p class="muted-copy">发送消息后，这里会显示模型决策、工具执行和最终回答。</p>
+            </div>
+          </section>
+
+          <section class="inspector-section todo-section">
+            <div class="section-heading">
+              <span class="section-index">04</span>
+              <h2>待办</h2>
+              <span class="count-badge" id="todoCount">0</span>
+            </div>
+            <div class="todo-list" id="todoList">
+              <p class="muted-copy">当前用户还没有待办。</p>
+            </div>
+          </section>
+
+          <section class="runtime-card">
+            <div class="runtime-card-row">
+              <span>模型</span><strong id="modelName">—</strong>
+            </div>
+            <div class="runtime-card-row">
+              <span>最大循环</span><strong>6 steps</strong>
+            </div>
+            <div class="runtime-card-row">
+              <span>工具</span><strong>4 registered</strong>
+            </div>
+            <div class="runtime-card-row">
+              <span>存储</span><strong>SQLite</strong>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
